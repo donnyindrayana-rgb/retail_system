@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Item - Nichomaret ERP</title>
+    <!-- Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* RESET & BASE STYLES */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        body { background-color: #f1f5f9; color: #0f172a; min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* ---------------- TOPBAR (DARK NAVY) ---------------- */
+        .topbar {
+            height: 64px;
+            background-color: #09101d;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 20px; }
+        
+        /* Toggle Collapse Sidebar Button */
+        .btn-toggle-sidebar {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #ffffff;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .btn-toggle-sidebar:hover { background: #334155; }
+
+        .brand-logo { font-size: 18px; font-weight: 800; color: #ffffff; text-decoration: none; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        .brand-logo span { color: #38bdf8; }
+
+        .search-top {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 8px 16px;
+            width: 300px;
+            color: #ffffff;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .search-top::placeholder { color: #94a3b8; }
+        .search-top:focus { border-color: #38bdf8; background-color: #0f172a; }
+
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .btn-quick-action { background-color: #1e293b; color: #ffffff; border: 1px solid #334155; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .btn-quick-action:hover { background-color: #334155; }
+
+        .user-profile { display: flex; align-items: center; gap: 10px; padding-left: 12px; border-left: 1px solid #1e293b; }
+        .avatar-box { width: 34px; height: 34px; border-radius: 8px; background-color: #38bdf8; color: #09101d; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; }
+        .user-info { display: flex; flex-direction: column; }
+        .user-name { font-size: 13px; font-weight: 600; color: #ffffff; line-height: 1.2; }
+        .user-role { font-size: 11px; color: #94a3b8; }
+
+        /* ---------------- SIDEBAR (DARK NAVY WITH SUB-MENU) ---------------- */
+        .sidebar {
+            width: 250px;
+            background-color: #09101d;
+            height: calc(100vh - 64px);
+            position: fixed;
+            top: 64px; left: 0;
+            padding: 20px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 1px solid #1e293b;
+            z-index: 90;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        /* Class saat sidebar di-hide / collapse secara penuh */
+        body.sidebar-collapsed .sidebar { transform: translateX(-100%); }
+        body.sidebar-collapsed .main-wrapper { margin-left: 0; }
+
+        .menu-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+        .menu-item { display: flex; flex-direction: column; }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 14px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .menu-link-content { display: flex; align-items: center; gap: 12px; }
+        .menu-link:hover { color: #ffffff; background-color: #1e293b; }
+        .menu-link.active {
+            background-color: #1e293b;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .menu-link .icon { font-size: 16px; width: 20px; text-align: center; }
+        
+        /* Indicator Panah Sub-menu */
+        .arrow-icon {
+            font-size: 10px;
+            transition: transform 0.3s ease;
+            color: #64748b;
+        }
+        .menu-item.open > .menu-link .arrow-icon {
+            transform: rotate(90deg);
+            color: #38bdf8;
+        }
+
+        /* ---------------- HIDE / SHOW SUB MENU ---------------- */
+        .submenu-list {
+            list-style: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+            background-color: #050b14;
+            border-radius: 8px;
+            margin-top: 2px;
+            padding-left: 12px;
+        }
+        .menu-item.open > .submenu-list {
+            max-height: 200px; /* Buka otomatis */
+            padding-top: 4px;
+            padding-bottom: 4px;
+        }
+
+        .submenu-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px 8px 28px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 12.5px;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .submenu-link::before {
+            content: "";
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            width: 4px;
+            height: 4px;
+            background-color: #475569;
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+        .submenu-link:hover { color: #ffffff; background-color: #1e293b; }
+        .submenu-link.active {
+            color: #38bdf8;
+            font-weight: 600;
+        }
+        .submenu-link.active::before {
+            background-color: #38bdf8;
+        }
+
+        .menu-divider { height: 1px; background-color: #1e293b; margin: 12px 0; }
+
+        /* ---------------- MAIN CONTENT WRAPPER ---------------- */
+        .main-wrapper {
+            margin-top: 64px;
+            margin-left: 250px;
+            padding: 28px;
+            flex: 1;
+            transition: margin-left 0.3s ease;
+        }
+
+        .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+        .page-title { font-size: 22px; font-weight: 700; color: #0f172a; }
+        .page-subtitle { font-size: 13px; color: #64748b; margin-top: 2px; }
+        .date-badge { background: #ffffff; border: 1px solid #e2e8f0; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; display: flex; align-items: center; gap: 8px; }
+
+        /* STATS SUMMARY CARDS */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .stat-label { font-size: 12.5px; font-weight: 600; color: #64748b; }
+        .stat-icon { width: 32px; height: 32px; border-radius: 8px; background-color: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #0f172a; }
+        .stat-value { font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+        .stat-trend { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+        .trend-up { color: #16a34a; }
+        .trend-down { color: #dc2626; }
+
+        /* CARD MAIN DATA */
+        .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+        
+        .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+        .search-box { display: flex; gap: 8px; flex: 1; max-width: 380px; }
+        .form-control { padding: 9px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13.5px; outline: none; transition: border-color 0.2s; background-color: #fff; width: 100%; }
+        
+        .btn { padding: 9px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-primary { background-color: #09101d; color: #ffffff; }
+        .btn-primary:hover { background-color: #1e293b; }
+        .btn-secondary { background-color: #f1f5f9; color: #475569; }
+        .btn-secondary:hover { background-color: #e2e8f0; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+        .btn-edit { background-color: #e0f2fe; color: #0369a1; }
+
+        /* DATA TABLE */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background-color: #f8fafc; color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; font-size: 13.5px; color: #334155; }
+        
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 600; }
+        .badge-pcs { background-color: #e0f2fe; color: #0369a1; }
+        .badge-box { background-color: #dcfce7; color: #15803d; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+
+        /* MODAL POP-UP STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(9, 16, 29, 0.6);
+            backdrop-filter: blur(3px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card { background: #ffffff; width: 100%; max-width: 480px; border-radius: 12px; overflow: hidden; }
+        .modal-header { padding: 18px 24px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 24px; }
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 12.5px; font-weight: 600; color: #475569; margin-bottom: 6px; }
+        .modal-footer { padding: 16px 24px; background-color: #f8fafc; border-top: 1px solid #f1f5f9; display: flex; justify-content: flex-end; gap: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="btn-toggle-sidebar" id="btnToggleSidebar" title="Hide/Show Sidebar">☰</button>
+            <a href="#" class="brand-logo">
+                <span style="font-size: 20px;">⚡</span> NICHOMARET<span>ERP</span>
+            </a>
+            <input type="text" class="search-top" placeholder="Search items, suppliers, POs...">
+        </div>
+        <div class="topbar-right">
+            <button class="btn-quick-action"><span>+</span> Quick Actions</button>
+            <span style="font-size: 18px; cursor: pointer; color: #94a3b8;">🔔</span>
+            <div class="user-profile">
+                <div class="avatar-box">JD</div>
+                <div class="user-info">
+                    <span class="user-name">John Doe</span>
+                    <span class="user-role">Administrator</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. SIDEBAR WITH COLLAPSIBLE SUB-MENUS -->
+    <aside class="sidebar">
+        <div>
+            <ul class="menu-list">
+                <!-- MENU DASHBOARD (NO SUBMENU) -->
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <div class="menu-link-content">
+                            <span class="icon">📊</span>
+                            <span>Dashboard</span>
+                        </div>
+                    </a>
+                </li>
+
+                <!-- MENU MASTER DATA (HAS SUBMENU - OPEN BY DEFAULT) -->
+                <li class="menu-item open">
+                    <div class="menu-link active">
+                        <div class="menu-link-content">
+                            <span class="icon">📦</span>
+                            <span>Master Data</span>
+                        </div>
+                        <span class="arrow-icon">▶</span>
+                    </div>
+                    <ul class="submenu-list">
+                        <li><a href="#" class="submenu-link active">Master Item Katalog</a></li>
+                        <li><a href="#" class="submenu-link">Kategori & Brand</a></li>
+                        <li><a href="#" class="submenu-link">Harga & Diskon</a></li>
+                    </ul>
+                </li>
+
+                <!-- MENU SUPPLIER & PURCHASING (HAS SUBMENU) -->
+                <li class="menu-item">
+                    <div class="menu-link">
+                        <div class="menu-link-content">
+                            <span class="icon">🏭</span>
+                            <span>Purchasing</span>
+                        </div>
+                        <span class="arrow-icon">▶</span>
+                    </div>
+                    <ul class="submenu-list">
+                        <li><a href="#" class="submenu-link">Data Supplier</a></li>
+                        <li><a href="#" class="submenu-link">Purchase Order (PO)</a></li>
+                        <li><a href="#" class="submenu-link">Penerimaan Barang</a></li>
+                    </ul>
+                </li>
+
+                <!-- MENU FINANCE (HAS SUBMENU) -->
+                <li class="menu-item">
+                    <div class="menu-link">
+                        <div class="menu-link-content">
+                            <span class="icon">💰</span>
+                            <span>Finance</span>
+                        </div>
+                        <span class="arrow-icon">▶</span>
+                    </div>
+                    <ul class="submenu-list">
+                        <li><a href="#" class="submenu-link">Hutang (AP)</a></li>
+                        <li><a href="#" class="submenu-link">Piutang (AR)</a></li>
+                        <li><a href="#" class="submenu-link">Invoice Pembayaran</a></li>
+                    </ul>
+                </li>
+
+                <!-- MENU REPORTS (NO SUBMENU) -->
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <div class="menu-link-content">
+                            <span class="icon">📈</span>
+                            <span>Reports</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <div class="menu-divider"></div>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <div class="menu-link-content">
+                            <span class="icon">⚙️</span>
+                            <span>Setting</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link">
+                        <div class="menu-link-content">
+                            <span class="icon">❓</span>
+                            <span>Help Center</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" style="color: #f87171;">
+                        <div class="menu-link-content">
+                            <span class="icon">🚪</span>
+                            <span>Log Out</span>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- 3. MAIN CONTENT -->
+    <div class="main-wrapper">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Welcome back, John! 👋</h1>
+                <p class="page-subtitle">Berikut ringkasan data katalog Master Item toko hari ini.</p>
+            </div>
+            <div class="date-badge">
+                📅 <span>August 14, 2026</span>
+            </div>
+        </div>
+
+        <!-- METRICS CARDS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Total Master Item</span>
+                    <div class="stat-icon">📦</div>
+                </div>
+                <div class="stat-value">128</div>
+                <div class="stat-trend trend-up"><span>↑ 12%</span> <span style="color: #94a3b8; font-weight: normal;">from last month</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Item Aktif</span>
+                    <div class="stat-icon">✅</div>
+                </div>
+                <div class="stat-value">114</div>
+                <div class="stat-trend trend-up"><span>↑ 8%</span> <span style="color: #94a3b8; font-weight: normal;">from last month</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Stok Kritis</span>
+                    <div class="stat-icon">⚠️</div>
+                </div>
+                <div class="stat-value">12</div>
+                <div class="stat-trend trend-down"><span>↓ 3%</span> <span style="color: #94a3b8; font-weight: normal;">from last month</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-label">Pending PO Item</span>
+                    <div class="stat-icon">📝</div>
+                </div>
+                <div class="stat-value">23</div>
+                <div class="stat-trend trend-up"><span>↑ 5%</span> <span style="color: #94a3b8; font-weight: normal;">from last month</span></div>
+            </div>
+        </div>
+
+        <!-- MAIN TABLE DATA -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2 style="font-size: 18px; font-weight: 700; color: #0f172a;">Data Master Item Katalog</h2>
+                    <p style="font-size: 13px; color: #64748b; margin-top: 2px;">Kelola kode item, satuan UOM, dan penetapan harga jual.</p>
+                </div>
+                <button class="btn btn-primary" id="btnTambah">+ Tambah Item Baru</button>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <input type="text" class="form-control" placeholder="Cari Kode atau Nama Item...">
+                    <button class="btn btn-secondary">Cari</button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 5%;">No</th>
+                            <th class="text-center" style="width: 15%;">Kode Item</th>
+                            <th style="width: 40%;">Nama Master Item</th>
+                            <th class="text-center" style="width: 15%;">Satuan (UOM)</th>
+                            <th class="text-right" style="width: 15%;">Harga Satuan</th>
+                            <th class="text-center" style="width: 10%;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-center">1</td>
+                            <td class="text-center"><strong>ITM-001</strong></td>
+                            <td>Minyak Goreng Pouch 2L</td>
+                            <td class="text-center"><span class="badge badge-pcs">Pcs</span></td>
+                            <td class="text-right">Rp 34.500</td>
+                            <td class="text-center"><button class="btn btn-sm btn-edit btn-action-edit">Edit</button></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">2</td>
+                            <td class="text-center"><strong>ITM-002</strong></td>
+                            <td>Beras Premium 5kg</td>
+                            <td class="text-center"><span class="badge badge-pcs">Pcs</span></td>
+                            <td class="text-right">Rp 72.000</td>
+                            <td class="text-center"><button class="btn btn-sm btn-edit btn-action-edit">Edit</button></td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">3</td>
+                            <td class="text-center"><strong>ITM-003</strong></td>
+                            <td>Gula Pasir Kristal 1kg</td>
+                            <td class="text-center"><span class="badge badge-box">Box</span></td>
+                            <td class="text-right">Rp 17.500</td>
+                            <td class="text-center"><button class="btn btn-sm btn-edit btn-action-edit">Edit</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalItem">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 style="font-size: 16px; font-weight: 700; color: #0f172a;" id="modalTitle">✨ Tambah Master Item Baru</h3>
+                <button class="btn btn-sm btn-secondary" id="btnCloseHeader" style="border-radius: 50%; padding: 4px 8px;">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Kode Item</label>
+                    <input type="text" class="form-control" id="inputKode" value="ITM-004" readonly style="background-color: #f8fafc;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nama Master Item</label>
+                    <input type="text" class="form-control" id="inputNama" placeholder="Contoh: Sabun Mandi Cair 450ml">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Satuan (UOM)</label>
+                    <select class="form-control" id="inputSatuan">
+                        <option value="Pcs">Pcs</option>
+                        <option value="Box">Box</option>
+                        <option value="Karton">Karton</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Harga Satuan (Rp)</label>
+                    <input type="number" class="form-control" id="inputHarga" placeholder="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btnBatal">Batal</button>
+                <button class="btn btn-primary" id="btnSimpan">Simpan Item</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT UNTUK SUB-MENU HIDE/SHOW & SIDEBAR TOGGLE -->
+    <script>
+        // 1. Fitur Accordion Sub-Menu (Hide/Show Submenu)
+        const menuItems = document.querySelectorAll('.menu-item');
+
+        menuItems.forEach(item => {
+            const menuLink = item.querySelector('.menu-link');
+            const subMenuList = item.querySelector('.submenu-list');
+
+            if (subMenuList) {
+                menuLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Tutup submenu lain yang sedang terbuka (Opsional - gaya accordion)
+                    menuItems.forEach(otherItem => {
+                        if (otherItem !== item && otherItem.classList.contains('open')) {
+                            otherItem.classList.remove('open');
+                        }
+                    });
+
+                    // Toggle status open/hide pada menu yang diklik
+                    item.classList.toggle('open');
+                });
+            }
+        });
+
+        // 2. Fitur Hide Full Sidebar (Toggle Sidebar Hamburger Button)
+        const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+        btnToggleSidebar.addEventListener('click', () => {
+            document.body.classList.toggle('sidebar-collapsed');
+        });
+
+        // 3. Logic Pop-Up Modal
+        const modal = document.getElementById('modalItem');
+        const btnTambah = document.getElementById('btnTambah');
+        const btnBatal = document.getElementById('btnBatal');
+        const btnCloseHeader = document.getElementById('btnCloseHeader');
+        const btnSimpan = document.getElementById('btnSimpan');
+        const editButtons = document.querySelectorAll('.btn-action-edit');
+
+        btnTambah.addEventListener('click', () => { modal.classList.add('active'); });
+        const closeModal = () => { modal.classList.remove('active'); };
+        btnBatal.addEventListener('click', closeModal);
+        btnCloseHeader.addEventListener('click', closeModal);
+        btnSimpan.addEventListener('click', () => { alert('Data tersimpan!'); closeModal(); });
+        editButtons.forEach(btn => {
+            btn.addEventListener('click', () => { modal.classList.add('active'); });
+        });
+    </script>
+</body>
+</html>

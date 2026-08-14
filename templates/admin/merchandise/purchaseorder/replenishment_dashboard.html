@@ -1,0 +1,57 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="flex flex-col gap-6">
+    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+            {% trans "Dashboard Replenishment Supplier" %}
+        </h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            {% trans "Pilih supplier di bawah ini untuk langsung membuat Purchase Order (PO) dengan tipe Replenishment otomatis berdasarkan stok minimum toko." %}
+        </p>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+                        <th class="py-3 px-4 font-semibold text-sm text-gray-700 dark:text-gray-300">{% trans "Kode Supplier" %}</th>
+                        <th class="py-3 px-4 font-semibold text-sm text-gray-700 dark:text-gray-300">{% trans "Nama Perusahaan" %}</th>
+                        <th class="py-3 px-4 font-semibold text-sm text-gray-700 dark:text-gray-300">{% trans "Kontak Person" %}</th>
+                        <th class="py-3 px-4 font-semibold text-sm text-gray-700 dark:text-gray-300">{% trans "TOP (Days)" %}</th>
+                        <th class="py-3 px-4 font-semibold text-sm text-gray-700 dark:text-gray-300">{% trans "Sistem Pesanan" %}</th>
+                        <th class="py-3 px-4 font-semibold text-sm text-gray-700 dark:text-gray-300 text-center">{% trans "Aksi" %}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for supplier in suppliers %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors">
+                        <td class="py-3 px-4 text-sm font-medium text-gray-900 dark:text-white">{{ supplier.kode_supplier }}</td>
+                        <td class="py-3 px-4 text-sm text-gray-800 dark:text-gray-200">{{ supplier.nama_perusahaan }}</td>
+                        <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{{ supplier.kontak_person|default:"-" }}</td>
+                        <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">{{ supplier.top_days }} Hari</td>
+                        <td class="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                                {{ supplier.sistem_pesanan }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <a href="{% url 'admin:merchandise_purchaseorder_add' %}?supplier_id={{ supplier.id }}" 
+                               class="inline-flex items-center justify-center px-3 py-1.5 text-xs font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md shadow-sm transition-colors">
+                                {% trans "Buat PO Replenishment" %}
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                            {% trans "Tidak ada data supplier yang tersedia." %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

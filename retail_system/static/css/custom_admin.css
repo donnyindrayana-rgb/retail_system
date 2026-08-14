@@ -1,0 +1,197 @@
+/* ==========================================================================
+   NICHOMARET RETAIL - CUSTOM EMERALD THEME, FORMS & COMPACT DENSITY
+   ========================================================================== */
+
+/* 1. Pengaturan Skema Warna Emerald / Green Retail */
+:root {
+    --color-primary-50: 236 253 245;
+    --color-primary-100: 209 250 229;
+    --color-primary-200: 167 243 208;
+    --color-primary-300: 110 231 183;
+    --color-primary-400: 52 211 153;
+    --color-primary-500: 16 185 129;
+    --color-primary-600: 5 150 105;  /* Main Theme Color Emerald */
+    --color-primary-700: 4 120 87;
+    --color-primary-800: 6 95 70;
+    --color-primary-900: 6 78 59;
+}
+
+/* 2. Styling Container Card Form & Module Wrapper */
+.module, 
+.inline-group, 
+.unfold-form,
+.unfold-admin .bg-white, 
+.unfold-admin .dark\:bg-gray-800 {
+    border-radius: 0.875rem !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
+    background-color: #ffffff !important;
+    padding: 1.25rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Dark Mode Support untuk Container */
+.dark .module, 
+.dark .inline-group, 
+.dark .unfold-form,
+.dark .unfold-admin .bg-white, 
+.dark .unfold-admin .dark\:bg-gray-800 {
+    background-color: #1f2937 !important;
+    border-color: rgba(51, 65, 85, 0.8) !important;
+}
+
+/* 3. Field Input, Select, & Textarea (Diselaraskan ke Emerald Focus) */
+input[type="text"], input[type="password"], input[type="email"], 
+input[type="number"], input[type="url"], input[type="date"], 
+select, textarea {
+    border-radius: 0.5rem !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 0.55rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    transition: all 0.2s ease-in-out !important;
+    background-color: #f8fafc !important;
+    color: #1e293b !important;
+}
+
+.dark input[type="text"], .dark input[type="password"], .dark input[type="email"], 
+.dark input[type="number"], .dark input[type="url"], .dark input[type="date"], 
+.dark select, .dark textarea {
+    background-color: #111827 !important;
+    border-color: #374151 !important;
+    color: #f9fafb !important;
+}
+
+/* Focus State dengan aksen Hijau Emerald */
+input:focus, select:focus, textarea:focus {
+    border-color: #059669 !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15) !important;
+    outline: none !important;
+}
+
+.dark input:focus, .dark select:focus, .dark textarea:focus {
+    background-color: #1f2937 !important;
+}
+
+/* 4. Button / Tombol Utama & Sekunder */
+.button, input[type="submit"], .submit-row a, .button.default {
+    border-radius: 0.5rem !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1.25rem !important;
+    font-size: 0.875rem !important;
+    transition: all 0.2s ease !important;
+}
+
+/* 5. Compact Table Styling (Sangat Optimal untuk SKU & Stok Melimpah) */
+#changelist table,
+.unfold-admin table {
+    border-radius: 0.5rem !important;
+    overflow: hidden !important;
+}
+
+.unfold-admin table td, 
+.unfold-admin table th {
+    padding-top: 0.625rem !important;
+    padding-bottom: 0.625rem !important;
+    font-size: 0.8125rem !important;
+}
+
+/* Header Tabel yang Kontras */
+#changelist table thead th,
+.unfold-admin table thead th {
+    background-color: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.05em !important;
+}
+
+.dark #changelist table thead th,
+.dark .unfold-admin table thead th {
+    background-color: #0f172a !important;
+    color: #94a3b8 !important;
+}
+
+/* ==========================================================================
+   PERBAIKAN LAYOUT TOMBOL RELASI / INLINE (EDIT, TAMBAH, HAPUS, VIEW)
+   ========================================================================== */
+
+/* Membungkus select input dan tombol relasi agar berdampingan rapi */
+.tabular td.field-item,
+.tabular td.field-rak_tujuan,
+.tabular td[class*="field-"] {
+    position: relative;
+}
+
+/* Memaksa wrapper select dan tombol aksi menjadi satu baris (Flexbox) */
+.tabular .related-widget-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    width: 100% !important;
+}
+
+/* Mengatur dropdown agar mengisi ruang fleksibel */
+.tabular .related-widget-wrapper select,
+.tabular td select {
+    flex: 1 1 auto !important;
+    min-width: 130px !important;
+    width: auto !important;
+}
+
+/* Mengubah kumpulan tombol ikon (pensil, tambah, silang, mata) agar berjejer ke samping */
+.tabular div.related-widget-wrapper-links,
+.related-widget-wrapper-links {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 4px !important;
+    margin-top: 0 !important;
+    vertical-align: middle !important;
+}
+
+/* Mempercantik tampilan tombol ikon individu */
+.tabular div.related-widget-wrapper-links a,
+.related-widget-wrapper-links a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 4px !important;
+    border-radius: 4px !important;
+    background-color: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    transition: all 0.2s ease !important;
+}
+
+.tabular div.related-widget-wrapper-links a:hover,
+.related-widget-wrapper-links a:hover {
+    background-color: #e2e8f0 !important;
+    border-color: #94a3b8 !important;
+}
+
+/* 7. Custom Scrollbar Elegan */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* 8. Penyelarasan Posisi Ikon */
+.material-symbols-outlined, 
+.material-icons,
+.unfold-icon {
+    vertical-align: middle !important;
+    position: relative;
+    top: -1px;
+}
