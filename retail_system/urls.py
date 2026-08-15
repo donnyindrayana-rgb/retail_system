@@ -7,6 +7,9 @@ from django.views.generic.base import RedirectView
 from django.templatetags.static import static
 
 urlpatterns = [
+    # Redirect otomatis ke halaman admin saat mengakses root URL (/)
+    path('', RedirectView.as_view(url='/admin/', permanent=False)),
+
     # Redirect otomatis request /favicon.ico ke logo Nichomaret PNG
     path(
         'favicon.ico',
