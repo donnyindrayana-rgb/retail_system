@@ -28,9 +28,9 @@ class Divisi(models.Model):
             self.kode_divisi = self.kode_divisi.upper()
 
         if not self.kode_divisi:
-            last_obj = Divisi.objects.all().order_by('id').last()
-            next_num = (last_obj.id + 1) if last_obj else 1
-            self.kode_divisi = str(next_num)[-1]
+            # Mengambil divisi terbanyak untuk penentuan urutan berikutnya
+            existing_count = Divisi.objects.count()
+            self.kode_divisi = str(existing_count + 1)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -53,9 +53,11 @@ class Dept(models.Model):
             self.kode_dept = self.kode_dept.upper()
 
         if not self.kode_dept and self.divisi and self.divisi.kode_divisi:
-            last_obj = Dept.objects.filter(divisi=self.divisi).order_by('id').last()
-            next_num = (last_obj.id + 1) if last_obj else 1
-            self.kode_dept = f'{self.divisi.kode_divisi}{next_num % 10}'
+            # Hitung Dept yang sudah ada di bawah Divisi ini
+            existing_count = Dept.objects.filter(divisi=self.divisi).count()
+            next_num = existing_count + 1
+            # Contoh: Divisi 3 + Dept urutan 1 -> "31"
+            self.kode_dept = f'{self.divisi.kode_divisi}{next_num}'
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -78,9 +80,11 @@ class Category(models.Model):
             self.kode_category = self.kode_category.upper()
 
         if not self.kode_category and self.dept and self.dept.kode_dept:
-            last_obj = Category.objects.filter(dept=self.dept).order_by('id').last()
-            next_num = (last_obj.id + 1) if last_obj else 1
-            self.kode_category = f'{self.dept.kode_dept}{next_num % 10}'
+            # Hitung Category yang sudah ada di bawah Department ini
+            existing_count = Category.objects.filter(dept=self.dept).count()
+            next_num = existing_count + 1
+            # Contoh: Dept 31 + Category urutan 1 -> "311", urutan 2 -> "312", dst.
+            self.kode_category = f'{self.dept.kode_dept}{next_num}'
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -103,9 +107,11 @@ class SubCategory(models.Model):
             self.kode_sub = self.kode_sub.upper()
 
         if not self.kode_sub and self.category and self.category.kode_category:
-            last_obj = SubCategory.objects.filter(category=self.category).order_by('id').last()
-            next_num = (last_obj.id + 1) if last_obj else 1
-            self.kode_sub = f'{self.category.kode_category}{next_num % 10}'
+            # Hitung SubCategory yang sudah ada di bawah Category ini
+            existing_count = SubCategory.objects.filter(category=self.category).count()
+            next_num = existing_count + 1
+            # Contoh: Category 311 + SubCategory urutan 1 -> "3111"
+            self.kode_sub = f'{self.category.kode_category}{next_num}'
         super().save(*args, **kwargs)
 
     def __str__(self):
